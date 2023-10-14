@@ -20,6 +20,10 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: cgaspard/mssql-docker
 
+    - name: Get the date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y%m%d.%H%M')"
+    
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v2
       with:
@@ -28,4 +32,4 @@ jobs:
         push: true
         tags: |
           cjgaspard/mssql-server:latest
-          cjgaspard/mssql-server:${{ format('{0:yyyyMMdd.HHmm}', github.run_number) }}
+          cjgaspard/mssql-server:${{ steps.date.outputs.date }}
