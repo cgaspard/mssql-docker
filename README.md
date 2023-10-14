@@ -37,7 +37,7 @@ docker build -t custom-mssql:latest .
 To run a container using the built image, use the following command:
 
 ```sh
-docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=<YourPassword>' -p 1433:1433 custom-mssql:latest
+docker run -d --name sqlserver --restart always --platform=linux/amd64 --cap-add SYS_PTRACE --env MSSQL_MAX_MEMORYLIMIT_MB=2048 --env TZ=America/Chicago --env 'ACCEPT_EULA=1' --env 'MSSQL_SA_PASSWORD=<YourPassword>' -p 1433:1433 cjgaspard/mssql-server:2022-ubuntu-20.04
 ```
 
 Ensure to replace `<YourPassword>` with your desired SA password.
