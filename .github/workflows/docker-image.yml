@@ -38,6 +38,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: cgaspard/mssql-docker
+        repository: cjgaspard/mssql-server
         readme-filepath: ./README.md
         short-description: "MSSQL Server 2022 on Ubuntu 20.04"
