@@ -19,6 +19,8 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: cgaspard/mssql-docker
+        readme-filepath: ./README.md
+        short-description: "MSSQL Server 2022 on Ubuntu 20.04"
 
     - name: Get the date
       id: date
