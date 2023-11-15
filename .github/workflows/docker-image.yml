@@ -1,43 +1,55 @@
-name: Build, Push and Update DockerHub README
+name: Build and Push Docker Image
 
 on:
   push:
     branches:
       - main
+      - '*'
 
 jobs:
-  build_push_update:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Get the Date
+        if: github.ref == 'refs/heads/main'
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
-    - name: Get the date
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y%m%d.%H%M')"
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-    - name: Build and Push Docker Image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: Dockerfile
-        push: true
-        tags: |
-          cjgaspard/mssql-server:latest
-          cjgaspard/mssql-server:${{ steps.date.outputs.date }}
-          cjgaspard/mssql-server:2022-ubuntu-20.04
+      - name: Build and Push Docker Image for Main Branch
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            cjgaspard/mssql-server:latest
+            cjgaspard/mssql-server:${{ steps.date.outputs.date }}
+            cjgaspard/mssql-server:2022-ubuntu-20.04
 
-    - name: Docker Hub Description
-      uses: peter-evans/dockerhub-description@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: cjgaspard/mssql-server
-        readme-filepath: ./README.md
-        short-description: "MSSQL Server 2022 on Ubuntu 20.04"
+      - name: Build and Push Docker Image for Other Branches
+        if: github.ref != 'refs/heads/main'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: cjgaspard/mssql-server:${{ github.head_ref }}
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: cjgaspard/mssql-server
+          readme-filepath: ./README.md
+          short-description: "MSSQL Server 2022 on Ubuntu 20.04"
