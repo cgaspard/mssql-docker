@@ -13,6 +13,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      - name: Get Branch Name
+        id: branch-name
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+
       - name: Get the Date
         if: github.ref == 'refs/heads/main'
         id: date
@@ -43,8 +47,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: |
-            cjgaspard/mssql-server:${{ github.head_ref }}
+          tags: cjgaspard/mssql-server:${{ env.BRANCH_NAME }}
 
       - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v3
