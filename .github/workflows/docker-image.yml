@@ -43,7 +43,8 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: cjgaspard/mssql-server:${{ github.head_ref }}
+          tags: |
+            cjgaspard/mssql-server:${{ github.head_ref }}
 
       - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v3
