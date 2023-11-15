@@ -1,0 +1,17 @@
+#!/bin/bash
+
+docker rm -f -v mssql-test
+
+docker run -d \
+    --name mssql-test \
+    -p 5433:1433 \
+    --platform=linux/amd64 \
+    --cap-add SYS_PTRACE  \
+    --env 'TZ=America/Chicago' \
+    --env 'ACCEPT_EULA=1' \
+    --env 'MSSQL_SA_PASSWORD=Pa$$word123!' \
+    --env 'MSSQL_MAX_MEMORYLIMIT_MB=5632' \
+    --env 'BOOTSTRAP_SCRIPT=/bootstrap.sh' \
+    -v $(pwd)/assets/bootstrap.sh:/bootstrap.sh \
+    --memory 4g \
+    local-mssql-server:test
