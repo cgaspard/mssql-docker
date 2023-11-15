@@ -1,27 +1,20 @@
-USE Master;
-GO
-CREATE MASTER KEY ENCRYPTION
-BY PASSWORD='InsertStrongPasswordHere';
-GO
-
+-- Step 1: Create a self-signed certificate
 CREATE CERTIFICATE TDE_Cert
-WITH
-SUBJECT='Database_Encryption';
-GO
+WITH SUBJECT = 'TDE_Certificate';
 
-USE <DB>
-GO
+-- Step 2: Backup the certificate to a file with a private key
+-- Specify the file paths and passwords
+DECLARE @CertificateBackupPath NVARCHAR(200) = '/TDE_Cert_Backup.cer'; -- Path to backup the certificate
+DECLARE @PrivateKeyBackupPath NVARCHAR(200) = '/TDE_Cert_PrivateKey.pvk'; -- Path to backup the private key
+DECLARE @PrivateKeyPassword NVARCHAR(50) = 'Td3$trongPwd1'; -- Password for the private key
 
-CREATE DATABASE ENCRYPTION KEY
-WITH ALGORITHM = AES_256
-ENCRYPTION BY SERVER CERTIFICATE TDE_Cert;
-GO
-
-ALTER DATABASE <DB>
-SET ENCRYPTION ON;
-GO
-
+-- Backing up the certificate and private key
 BACKUP CERTIFICATE TDE_Cert
-TO FILE = '/tmp/TDE_Cert'
-WITH PRIVATE KEY (file='/temp/TDE_CertKey.pvk',
-ENCRYPTION BY PASSWORD='InsertStrongPasswordHere')
+TO FILE = @CertificateBackupPath
+WITH PRIVATE KEY (
+    FILE = @PrivateKeyBackupPath,
+    ENCRYPTION BY PASSWORD = @PrivateKeyPassword
+);
+
+-- Output the paths for confirmation
+SELECT @CertificateBackupPath AS CertificatePath, @PrivateKeyBackupPath AS PrivateKeyPath;
