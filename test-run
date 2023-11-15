@@ -12,6 +12,7 @@ docker run -d \
     --env 'MSSQL_SA_PASSWORD=Pa$$word123!' \
     --env 'MSSQL_MAX_MEMORYLIMIT_MB=5632' \
     --env 'BOOTSTRAP_SCRIPT=/bootstrap.sh' \
+    --env 'BOOTSTRAP_DELAY=5' \
     -v $(pwd)/assets/bootstrap.sh:/bootstrap.sh \
     --memory 4g \
     local-mssql-server:test
