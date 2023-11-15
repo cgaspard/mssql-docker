@@ -36,13 +36,24 @@ start_sql_server() {
 install_certificate() {
     # Checks if certificate file, private key file, and password are provided.
     if [ -n "$CERTIFICATE_FILE" ] && [ -n "$PRIVATE_KEY_FILE" ] && [ -n "$CERTIFICATE_PASSWORD" ]; then
-        # Checks if the certificate already exists in SQL Server.
-        if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -Q "SELECT * FROM sys.certificates WHERE name = 'TDE_Certificate';" | grep -q "TDE_Certificate"; then
+        # Checks if the master key already exists in the master database.
+        echo "############################### Checking for existing master key..."
+        if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -Q "USE master; SELECT * FROM sys.symmetric_keys WHERE name = '##MS_DatabaseMasterKey##';" | grep -q "##MS_DatabaseMasterKey##"; then
+            echo "############################### Master Key already exists, skipping creation."
+        else
+            # Creates the master key if it does not already exist.
+            echo "############################### Creating master key..."
+            /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -Q "USE master; CREATE MASTER KEY ENCRYPTION BY PASSWORD = '$CERTIFICATE_PASSWORD';"
+        fi
+
+        # Checks if the certificate already exists.
+        echo "############################### Checking for existing certificate..."
+        if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -Q "USE master; SELECT * FROM sys.certificates WHERE name = 'TDE_Certificate';" | grep -q "TDE_Certificate"; then
             echo "############################### Certificate 'TDE_Certificate' already exists, skipping installation."
         else
             # Installs the certificate if it does not already exist.
             echo "############################### Installing certificate from $CERTIFICATE_FILE..."
-            /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -Q "CREATE CERTIFICATE TDE_Certificate FROM FILE = '$CERTIFICATE_FILE' WITH PRIVATE KEY (FILE = '$PRIVATE_KEY_FILE', DECRYPTION BY PASSWORD = '$CERTIFICATE_PASSWORD');"
+            /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -Q "USE master; CREATE CERTIFICATE TDE_Certificate FROM FILE = '$CERTIFICATE_FILE' WITH PRIVATE KEY (FILE = '$PRIVATE_KEY_FILE', DECRYPTION BY PASSWORD = '$CERTIFICATE_PASSWORD');"
         fi
     else
         echo "############################### Certificate file, private key file, or password not set, skipping certificate installation."
