@@ -28,8 +28,8 @@ start_sql_server() {
     done
 
     # Waits an additional 10 seconds after SQL Server starts for it to fully initialize.
-    echo "############################### SQL Server started, waiting 10 seconds to allow things to fully warm up"
-    sleep 10
+    echo "############################### SQL Server started, waiting 30 seconds to allow things to fully warm up"
+    sleep 30
 }
 
 # Function to install a certificate if the required variables are set.
