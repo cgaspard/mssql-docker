@@ -1,3 +1,74 @@
 {
-
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "docker-auth",
+            "command": "docker-login",
+            "windows": {
+                "command": "docker login"
+            },
+            "type": "shell",
+            "problemMatcher": []
+        },        
+        {
+            "label": "docker-mssql image build",
+            "command": "docker buildx build --platform linux/amd64 --progress=plain -t cjgaspard/mssql-server:2022-ubuntu-20.04 -t cjgaspard/mssql-server:$(date +'%Y%m%d-%H%M') -f ./Dockerfile .",
+            "type": "shell",
+            "problemMatcher": []
+        },
+        {
+            "label": "docker-mssql image push",
+            "command": "docker push --all-tags cjgaspard/mssql-server",
+            "type": "shell",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "databaseBackupType",
+            "description": "Production or Developer backup?",
+            "default": "Developer",
+            "options": [
+                "Developer",
+                "Production"
+            ]
+        },
+        {
+            "type": "promptString",
+            "id": "databaseName",
+            "description": "Enter the database you want to restore",
+        },
+        {
+            "type": "pickString",
+            "id": "mssqlMemory",
+            "description": "How much memory do you want to allocate to mssql container (docker must have at least this much allocated)?",
+            "default": "4G",
+            "options": [
+                "4G",
+                "6G",
+                "8G",
+                "16G",
+                "32G",
+                "56G",
+                "64G",
+            ]
+        },
+        {
+            "type": "pickString",
+            "id": "mssqlCpus",
+            "description": "How many CPUs do you want to allocate to the docker container (docker must have at least this much allocated)?",
+            "default": "4",
+            "options": [
+                "4",
+                "8",
+                "16"
+            ]
+        },
+        {
+            "type": "promptString",
+            "id": "personalAccessToken",
+            "description": "Enter a nuget personal access token.",
+        }
+    ]
 }
