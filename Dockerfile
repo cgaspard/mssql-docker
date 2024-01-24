@@ -3,7 +3,7 @@
 
 # Base OS layer: Latest Ubuntu LTS
 # FROM ubuntu:20.04
-FROM mcr.microsoft.com/mssql/server:2022-latest
+FROM mcr.microsoft.com/mssql/server:2022-CU11-ubuntu-20.04
 USER root
 
 #ENV MSSQL_MAX_MEMORYLIMIT_MB=4096
@@ -11,18 +11,20 @@ USER root
 # Install prerequistes since it is needed to get repo config for SQL server
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
-    apt-get install -yq curl apt-transport-https gnupg wget apt-transport-https software-properties-common netcat
+    apt-get install -yq curl apt-transport-https gnupg wget apt-transport-https software-properties-common netcat unixodbc-dev
     
 # Install SQL Server from apt
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     curl https://packages.microsoft.com/config/ubuntu/20.04/mssql-server-2022.list | tee /etc/apt/sources.list.d/mssql-server.list && \
     wget -q "https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb" && \
     dpkg -i packages-microsoft-prod.deb && \
-    apt-get update && \
-    apt-get install -y mssql-server-ha && \
-    apt-get install -y mssql-server-fts && \
-    apt-get install -y mssql-tools unixodbc-dev && \
-    echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+    apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install -y mssql-server-ha
+RUN apt-get install -y mssql-server-fts
+RUN apt-get install -y mssql-tools
+RUN apt-get install -y dotnet-runtime-6.0 dotnet-runtime-7.0
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
 
 # ADD THIS FOR POLYBASE
 #    #apt-get install -y mssql-server-polybase && \    

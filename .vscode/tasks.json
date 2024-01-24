@@ -11,8 +11,8 @@
             "problemMatcher": []
         },        
         {
-            "label": "docker-mssql image build",
-            "command": "docker buildx build --platform linux/amd64 --progress=plain -t cjgaspard/mssql-server:2022-ubuntu-20.04 -t cjgaspard/mssql-server:$(date +'%Y%m%d-%H%M') -f ./Dockerfile .",
+            "label": "docker-mssql image build and push",
+            "command": "docker buildx build --push --platform linux/amd64 --progress=plain -t cjgaspard/mssql-server:2022-ubuntu-20.04 -t cjgaspard/mssql-server:$(date +'%Y%m%d-%H%M') -f ./Dockerfile .",
             "type": "shell",
             "problemMatcher": []
         },
